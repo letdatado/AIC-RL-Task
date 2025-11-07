@@ -1,0 +1,77 @@
+```python
+def macro_f1(y_true, y_pred):
+    """
+    Compute macro-averaged F1 score for multi-class classification.
+    
+    Args:
+        y_true: Ground-truth labels (list, array, or iterable)
+        y_pred: Predicted labels (list, array, or iterable)
+    
+    Returns:
+        float: Macro-averaged F1 score in [0, 1]
+    
+    Raises:
+        ValueError: If y_true and y_pred have different lengths
+    
+    Handles:
+        - Any hashable label types (int, str, tuple, frozenset, etc.)
+        - NaN values treated as equal to each other
+        - Type-sensitive equality (True != 1, False != 0)
+        - Zero-division cases (precision/recall = 0 when denominator is 0)
+    """
+    
+    # Materialize inputs to lists for processing
+    y_true_list = list(y_true)
+    y_pred_list = list(y_pred)
+    
+    # Validate lengths
+    if len(y_true_list) != len(y_pred_list):
+        raise ValueError("y_true and y_pred must have the same length")
+    
+    # Helper function to normalize labels (handle NaN)
+    def normalize_label(label):
+        try:
+            if label != label:  # NaN check (NaN != NaN is True)
+                return ("__NAN__",)  # Sentinel for NaN
+        except TypeError:
+            pass
+        return label
+    
+    # Normalize all labels
+    y_true_normalized = [normalize_label(label) for label in y_true_list]
+    y_pred_normalized = [normalize_label(label) for label in y_pred_list]
+    
+    # Get all unique classes from both arrays
+    classes = set(y_true_normalized) | set(y_pred_normalized)
+    
+    # Handle empty case
+    if len(classes) == 0:
+        return 0.0
+    
+    f1_scores = []
+    
+    for cls in classes:
+        # Count TP, FP, FN
+        tp = sum(1 for yt, yp in zip(y_true_normalized, y_pred_normalized) 
+                 if yt == cls and yp == cls)
+        fp = sum(1 for yt, yp in zip(y_true_normalized, y_pred_normalized) 
+                 if yt != cls and yp == cls)
+        fn = sum(1 for yt, yp in zip(y_true_normalized, y_pred_normalized) 
+                 if yt == cls and yp != cls)
+        
+        # Compute precision and recall
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        
+        # Compute F1 score for this class
+        if precision + recall == 0:
+            f1 = 0.0
+        else:
+            f1 = 2 * precision * recall / (precision + recall)
+        
+        f1_scores.append(f1)
+    
+    # Return macro average
+    macro_f1_score = sum(f1_scores) / len(f1_scores) if f1_scores else 0.0
+    return macro_f1_score
+```

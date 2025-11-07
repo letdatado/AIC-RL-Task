@@ -1,0 +1,14 @@
+PASS:balanced_3class: 0.655555555556
+PASS:no_pred_for_class: 0.555555555556
+PASS:class_absent_in_truth: 0.555555555556
+PASS:gapped_labels: 0.555555555556
+PASS:string_labels_unseen_pred: 0.291666666667
+PASS:numpy_arrays: 0.500000000000
+PASS:perfect: 1.000000000000
+PASS:all_wrong: 0.000000000000
+PASS:length_mismatch: raised expected ValueError
+PASS:nan_as_label: 0.541666666667
+PASS:extreme_imbalance: 0.830795262267
+PASS:composite_labels: 0.300000000000
+PASS:generator_inputs: 0.388888888889
+GRADE:PASS
